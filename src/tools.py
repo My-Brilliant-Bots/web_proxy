@@ -12,8 +12,8 @@ def read_file_content(file_name):
             content = f.read()
 
         chunks = []
-        for i in range(0, len(content), 200000):
-            chunks.append(content[i:i + 200000])
+        for i in range(0, len(content), 350000):
+            chunks.append(content[i:i + 350000])
         return chunks
     except FileNotFoundError:
         print(f"Error: File '{file_name}' not found.")
