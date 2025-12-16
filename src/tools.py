@@ -10,7 +10,11 @@ def read_file_content(file_name):
     try:
         with open(file_name, 'r', encoding='utf-8') as f:
             content = f.read()
-        return content[:200000]
+
+        chunks = []
+        for i in range(0, len(content), 200000):
+            chunks.append(content[i:i + 200000])
+        return chunks
     except FileNotFoundError:
         print(f"Error: File '{file_name}' not found.")
         return None
