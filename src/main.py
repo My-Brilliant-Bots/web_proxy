@@ -16,7 +16,7 @@ async def main():
     print(f"Latest traffic log file: {latest_log}")
     file_content = read_file_content(latest_log)
     consolidated_report = await run_proxy_agent(file_content)
-    print(consolidated_report)
+    #print(consolidated_report)
 
 
 if __name__ == "__main__":

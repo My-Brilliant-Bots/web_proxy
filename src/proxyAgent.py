@@ -1,12 +1,15 @@
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_agentchat.messages import BaseChatMessage, TextMessage
 from autogen_agentchat.agents import AssistantAgent
+from autogen_core.tools import FunctionTool
 from autogen_core.models import ModelInfo
 from autogen_core import CancellationToken
 import markdown
 import asyncio
 import os
+from emailTool import send_email
 
+# Analyse the passed in web traffic log file using LLM
 async def web_traffic_analysis(model_client, traffic_log_file_content):
 
     system_prompt = """
@@ -31,11 +34,12 @@ async def web_traffic_analysis(model_client, traffic_log_file_content):
         await asyncio.sleep(70)
     return all_agent_responses
 
+# Consolidate all agent responses using an LLM
 async def create_consolidate_report(model_client, all_agent_responses):
 
     consolidate_report_prompt="""
     You are a smart agent responsible for merging multiple, markdown reports into a single consolidated
-    report. Each individual markdown report, that you have to consolidate, contains an user's requests.These requests are captured using a proxy server. The consolidated report, should ignore requests to fetch javascript files, icons, images. It should ignore calls for health checks or requests that track an user. The report should provide a clear picture of the user's browsing behaviour but should not contain information of all networks calls to fetch images, javascript files etc. Finally , you should create the report in markdown language
+    report. Each individual markdown report, that you have to consolidate, contains an user's requests.These requests are captured using a proxy server. The consolidated report, should ignore requests to fetch javascript files, icons, images. It should ignore calls for health checks or requests that track an user. The report should provide a clear picture of the user's browsing behaviour but should not contain information of all networks calls to fetch images, javascript files etc. The report should be in html.Finally, nnce the consilidated report is generated, you should email the report using the email tool provided. The subject of the email should be something like : Internet Activity for $date with the $date being the date the report was generated. 
     """
 
     reports = []
@@ -43,11 +47,22 @@ async def create_consolidate_report(model_client, all_agent_responses):
         message_content = f"Here is report {i+1} of the traffic log file:\n{all_agent_responses[i]}"
         reports.append(TextMessage(content=message_content, source="user"))
 
-    agent:AssistantAgent = AssistantAgent(name="consolidate_report_agent",model_client=model_client,system_message=consolidate_report_prompt)
+    agent:AssistantAgent = AssistantAgent(
+      name="consolidate_report_agent",
+      model_client=model_client,
+      system_message=consolidate_report_prompt,
+      tools=[send_email],
+      reflect_on_tool_use=True)
+
+    
     response: TextMessage = await agent.on_messages(messages=reports, cancellation_token=CancellationToken())
+
     consolidate_report = markdown.markdown(response.chat_message.content)
     return consolidate_report
 
+# Initialize AutoGen OpenAIChatCompletionClient and use it to analyse
+# the passed in web traffic logs and consolidate the analysis into a single
+# report , in markdown format
 async def run_proxy_agent(traffic_log_file_content):
     model_client = OpenAIChatCompletionClient(
     model="gpt-4.1-nano",
