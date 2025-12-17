@@ -55,7 +55,7 @@ This project requires **Python 3.12 or later**.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-repo/web-proxy.git
+    git clone https://github.com/My-Brilliant-Bots/web_proxy.git
     cd web-proxy
     ```
 

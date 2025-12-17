@@ -1,6 +1,7 @@
 import smtplib
 from email.message import EmailMessage
 import os
+import requests
 
 def send_email(subject:str, report:str):
   """ Sends an email with a subject and the consolidated report """
@@ -28,4 +29,14 @@ def send_email(subject:str, report:str):
       print("Email sent successfully!")
   except Exception as e:
       print(f"Error: {e}")
+
+def send_sms_text(text_message:str):
+    """ Sends an text message using SMS """
+    pushover_user = os.getenv("PUSHOVER_USER")
+    pushover_token = os.getenv("PUSHOVER_TOKEN")
+    pushover_url = os.getenv("PUSHOVER_URL")
+
+    print(f"Push: {text_message}")
+    payload = {"user": pushover_user, "token": pushover_token, "message": text_message}
+    requests.post(pushover_url, data=payload)
 

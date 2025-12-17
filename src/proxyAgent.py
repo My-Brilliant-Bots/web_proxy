@@ -7,7 +7,7 @@ from autogen_core import CancellationToken
 import markdown
 import asyncio
 import os
-from emailTool import send_email
+from emailTool import send_email,send_sms_text
 
 # Analyse the passed in web traffic log file using LLM
 async def web_traffic_analysis(model_client, traffic_log_file_content):
@@ -24,7 +24,9 @@ async def web_traffic_analysis(model_client, traffic_log_file_content):
 
     all_agent_responses = []
     for idx, a_message in enumerate(messages):
-      
+        if (idx > 1):
+          print("Break after 2 chunks")
+          break;
         agent:AssistantAgent = AssistantAgent(name="proxy_agent",model_client=model_client)
         response: TextMessage = await agent.on_messages(messages=[system_message,a_message], cancellation_token=CancellationToken())
         all_agent_responses.append(response)
@@ -37,7 +39,7 @@ async def create_consolidate_report(model_client, all_agent_responses):
 
     consolidate_report_prompt="""
     You are a smart agent responsible for merging multiple, markdown reports into a single consolidated
-    report. Each individual markdown report, that you have to consolidate, contains an user's requests.These requests are captured using a proxy server. The consolidated report, should ignore requests to fetch javascript files, icons, images. It should ignore calls for health checks or requests that track an user. The report should provide a clear picture of the user's browsing behaviour but should not contain information of all networks calls to fetch images, javascript files etc. The report should be in html.Finally, nnce the consilidated report is generated, you should email the report using the email tool provided. The subject of the email should be something like : Internet Activity for $date with the $date being the date the report was generated. 
+    report. Each individual markdown report, that you have to consolidate, contains an user's requests.These requests are captured using a proxy server. The consolidated report, should ignore requests to fetch javascript files, icons, images. It should ignore calls for health checks or requests that track an user. The report should provide a clear picture of the user's browsing behaviour but should not contain information of all networks calls to fetch images, javascript files etc. The report should be in html.Oonce the consilidated report is generated, you should email the report using the email tool provided. The subject of the email should be something like : Internet Activity for $date with the $date being the date the report was generated. Finally, once the email has been sent successfully, send an SMS notification using the sms tool provided
     """
 
     reports = []
@@ -49,7 +51,7 @@ async def create_consolidate_report(model_client, all_agent_responses):
       name="consolidate_report_agent",
       model_client=model_client,
       system_message=consolidate_report_prompt,
-      tools=[send_email],
+      tools=[send_email,send_sms_text],
       reflect_on_tool_use=True)
 
     
