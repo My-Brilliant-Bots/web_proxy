@@ -24,9 +24,7 @@ async def web_traffic_analysis(model_client, traffic_log_file_content):
 
     all_agent_responses = []
     for idx, a_message in enumerate(messages):
-        if (idx > 1):
-          print("Warning : Not sending all file data to speed up testing. Remove this check when testing is complete")
-          break;
+      
         agent:AssistantAgent = AssistantAgent(name="proxy_agent",model_client=model_client)
         response: TextMessage = await agent.on_messages(messages=[system_message,a_message], cancellation_token=CancellationToken())
         all_agent_responses.append(response)
