@@ -39,7 +39,40 @@ async def create_consolidate_report(model_client, all_agent_responses):
 
     consolidate_report_prompt="""
     You are a smart agent responsible for merging multiple, markdown reports into a single consolidated
-    report. Each individual markdown report, that you have to consolidate, contains an user's requests.These requests are captured using a proxy server. The consolidated report, should ignore requests to fetch javascript files, icons, images. It should ignore calls for health checks or requests that track an user. The report should provide a clear picture of the user's browsing behaviour but should not contain information of all networks calls to fetch images, javascript files etc. The report should be in html.Oonce the consilidated report is generated, you should email the report using the email tool provided. The subject of the email should be something like : Internet Activity for $date with the $date being the date the report was generated. Finally, once the email has been sent successfully, send an SMS notification using the sms tool provided
+    report. Each individual markdown report, that you have to consolidate, contains an user's requests.
+    These requests are captured using a proxy server. The consolidated report, should ignore requests to fetch 
+    javascript files, icons, images. It should ignore calls for health checks or requests that track an user. 
+    The report should provide a clear picture of the user's browsing behaviour but should not contain information of 
+    all networks calls to fetch images, javascript files etc. The reporst should also not contain third party ad
+    and tracking services. The report should list the websites visited by the user
+    and the number of times the user has interacted with that website. For google search, provide a high level summary of
+    what the user was searching. Group the searches by subject. Once again, please ignore calls for assets such as icons, images, css or scripts.
+    The report should be in html. Once the consolidated report is generated, you should email the report using the email tool provided. The subject of the email should be 
+    something like : Internet Activity for $date with the $date being the date the report was generated. 
+    Finally, once the email has been sent successfully, send an SMS notification using the sms tool provided
+
+    Sample Report format:
+
+    Web Traffic Analysis Summary for 2025-12-18 (hint: Title of report)
+
+    Websites Visited and Interaction Counts (hint: Section name in bold)
+
+        . artofproblemsolving.com (hint: Website name as a clickable hyperlink): 16 visits
+
+    High-Level Search and Browsing Activities (hint: Section name in bold)
+
+    The user primarily visited the Art of Problem Solving (AoPS) website, engaging with multiple pages and resources, including images, scripts, and interactive elements. The browsing included static assets like images and fonts, and interactions with various system and analytics services to support the browsing experience. Notably, the activity indicates active exploration of AoPS educational content, with no significant indication of personal search queries beyond site navigation.
+
+    Summary of Search Activity (hint: Section name in bold)
+
+    No explicit Google search queries were captured in the logs for this period, suggesting the user mainly navigated within the AoPS site and accessed knowledge resources directly or via bookmarks.
+
+    Summary of Tracking and Third-party Requests (hint: Section name in bold)
+
+    The traffic included requests to several third-party services for ads and analytics such as Google Analytics, Facebook, Bing, and Outbrain. These requests are typical for a browsing session that involves interaction with online educational and social platforms, containing user engagement and session tracking data.
+
+	
+
     """
 
     reports = []

@@ -35,3 +35,6 @@ inc/
 /*.zip
 .env
 *.pyc
+*.pem
+src/web_proxy.egg-info/dependency_links.txt
+/src/web_proxy.egg-info
